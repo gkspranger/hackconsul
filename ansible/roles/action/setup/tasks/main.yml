@@ -1,0 +1,8 @@
+---
+
+- name: setup nodename group
+  ansible.builtin.add_host:
+    name: localhost
+    groups:
+      - "{{ ansible_nodename }}"
+  changed_when: False

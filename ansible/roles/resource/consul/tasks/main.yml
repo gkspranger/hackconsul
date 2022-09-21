@@ -1,0 +1,73 @@
+---
+
+- name: install hashicorp repo
+  ansible.builtin.yum_repository:
+    name: hashicorp
+    description: Hashicorp Stable - $basearch
+    baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+    gpgcheck: True
+    enabled: False
+
+- name: install consul
+  ansible.builtin.dnf:
+    name: consul
+    state: present
+    disablerepo: "*"
+    enablerepo: hashicorp
+
+- name: remove consul.d/files
+  ansible.builtin.file:
+    path: "/etc/consul.d/{{ item }}"
+    state: absent
+  loop:
+    - consul.env
+    - consul.hcl
+
+- name: setup log/consul
+  ansible.builtin.file:
+    path: /var/log/consul
+    state: directory
+    owner: consul
+    group: consul
+    mode: 0755
+
+- name: setup system/consul.service
+  ansible.builtin.template:
+    src: consul.service
+    dest: /usr/lib/systemd/system/consul.service
+    owner: root
+    group: root
+    mode: 0644
+  register: consul_consul_service_file
+
+- name: force systemd reload when service file changes
+  ansible.builtin.systemd:
+    daemon_reload: True
+  changed_when: consul_consul_service_file.changed
+  when: consul_consul_service_file.changed
+
+- name: setup consul.d/myconsul.hcl file
+  ansible.builtin.template:
+    src: myconsul.hcl
+    dest: /etc/consul.d/myconsul.hcl
+    owner: consul
+    group: consul
+    mode: 0644
+  register: consul_myconsul_hcl_file
+
+- name: trigger restart consul
+  debug:
+    msg: trigger restart consul
+  changed_when: consul_myconsul_hcl_file.changed or consul_consul_service_file.changed
+  notify: restart consul
+
+- name: register consul service
+  ansible.builtin.service:
+    name: consul
+    enabled: True
+
+- name: start consul service
+  ansible.builtin.service:
+    name: consul
+    state: started
