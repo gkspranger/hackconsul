@@ -1,14 +1,18 @@
 $base = <<-SCRIPT
-# clean up
+# setup clean
 yum clean all
 
-# install python
+# setup python
 yum -y install python39-devel
 
-# install ansible-core
+# setup ansible-core
 python3 -m venv /opt/ansible
 /opt/ansible/bin/python3 -m pip install --upgrade pip
 /opt/ansible/bin/pip3 install ansible-core
+
+# setup consul
+cd /vagrant/ansible
+make run
 SCRIPT
 
 Vagrant.configure("2") do |config|
