@@ -24,46 +24,40 @@ make runserver
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.define "server1" do |s|
-    s.vm.box = "bento/rockylinux-8"
-    s.vm.hostname = "server1"
+  servers = [
+    {name: "server1", ip: "192.168.10.10", host_port: 18500},
+    {name: "server2", ip: "192.168.10.20", host_port: 28500},
+    {name: "server3", ip: "192.168.10.30", host_port: 38500},
+  ]
 
-    s.vm.network :private_network, ip: "192.168.10.10"
-    s.vm.network "forwarded_port", guest: 8500, host: 18500
+  servers.each { |item|
+    config.vm.define item[:name] do |s|
+      s.vm.box = "bento/rockylinux-8"
+      s.vm.hostname = item[:name]
 
-    s.vm.provision "shell", inline: $base
-    s.vm.provision "shell", inline: $server
-  end
+      s.vm.network :private_network, ip: item[:ip]
+      s.vm.network "forwarded_port", guest: 8500, host: item[:host_port]
 
-  config.vm.define "server2" do |s|
-    s.vm.box = "bento/rockylinux-8"
-    s.vm.hostname = "server2"
+      s.vm.provision "shell", inline: $base
+      s.vm.provision "shell", inline: $server
+    end
+  }
 
-    s.vm.network :private_network, ip: "192.168.10.20"
-    s.vm.network "forwarded_port", guest: 8500, host: 28500
+  clients = [
+    {name: "client1", ip: "192.168.10.40"},
+    {name: "client2", ip: "192.168.10.50"},
+    {name: "client3", ip: "192.168.10.60"},
+  ]
 
-    s.vm.provision "shell", inline: $base
-    s.vm.provision "shell", inline: $server
-  end
+  clients.each { |item|
+    config.vm.define item[:name] do |s|
+      s.vm.box = "bento/rockylinux-8"
+      s.vm.hostname = item[:name]
 
-  config.vm.define "server3" do |s|
-    s.vm.box = "bento/rockylinux-8"
-    s.vm.hostname = "server3"
+      s.vm.network :private_network, ip: item[:ip]
 
-    s.vm.network :private_network, ip: "192.168.10.30"
-    s.vm.network "forwarded_port", guest: 8500, host: 38500
-
-    s.vm.provision "shell", inline: $base
-    s.vm.provision "shell", inline: $server
-  end
-
-  config.vm.define "client1" do |s|
-    s.vm.box = "bento/rockylinux-8"
-    s.vm.hostname = "client1"
-
-    s.vm.network :private_network, ip: "192.168.10.40"
-
-    s.vm.provision "shell", inline: $base
-    s.vm.provision "shell", inline: $client
-  end
+      s.vm.provision "shell", inline: $base
+      s.vm.provision "shell", inline: $client
+    end
+  }
 end
