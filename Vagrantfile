@@ -9,10 +9,18 @@ yum -y install python39-devel
 python3 -m venv /opt/ansible
 /opt/ansible/bin/python3 -m pip install --upgrade pip
 /opt/ansible/bin/pip3 install ansible-core
+SCRIPT
 
-# setup consul
+$client = <<-SCRIPT
+# setup consul client
 cd /vagrant/ansible
-make run
+make runclient
+SCRIPT
+
+$server = <<-SCRIPT
+# setup consul server
+cd /vagrant/ansible
+make runserver
 SCRIPT
 
 Vagrant.configure("2") do |config|
@@ -24,6 +32,7 @@ Vagrant.configure("2") do |config|
     s.vm.network "forwarded_port", guest: 8500, host: 18500
 
     s.vm.provision "shell", inline: $base
+    s.vm.provision "shell", inline: $server
   end
 
   config.vm.define "server2" do |s|
@@ -34,6 +43,7 @@ Vagrant.configure("2") do |config|
     s.vm.network "forwarded_port", guest: 8500, host: 28500
 
     s.vm.provision "shell", inline: $base
+    s.vm.provision "shell", inline: $server
   end
 
   config.vm.define "server3" do |s|
@@ -44,5 +54,16 @@ Vagrant.configure("2") do |config|
     s.vm.network "forwarded_port", guest: 8500, host: 38500
 
     s.vm.provision "shell", inline: $base
+    s.vm.provision "shell", inline: $server
+  end
+
+  config.vm.define "client1" do |s|
+    s.vm.box = "bento/rockylinux-8"
+    s.vm.hostname = "client1"
+
+    s.vm.network :private_network, ip: "192.168.10.40"
+
+    s.vm.provision "shell", inline: $base
+    s.vm.provision "shell", inline: $client
   end
 end

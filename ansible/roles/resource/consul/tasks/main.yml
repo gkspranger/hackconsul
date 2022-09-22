@@ -16,6 +16,12 @@
     disablerepo: "*"
     enablerepo: hashicorp
 
+- name: install consul autocomplete
+  shell: |
+    consul -autocomplete-install &> /dev/null || echo "already installed"
+  register: consul_autocomplete_install
+  changed_when: consul_autocomplete_install.stdout != "already installed"
+
 - name: remove consul.d/files
   ansible.builtin.file:
     path: "/etc/consul.d/{{ item }}"
@@ -49,7 +55,7 @@
 
 - name: setup consul.d/myconsul.hcl file
   ansible.builtin.template:
-    src: myconsul.hcl
+    src: myconsul.common.hcl
     dest: /etc/consul.d/myconsul.hcl
     owner: consul
     group: consul

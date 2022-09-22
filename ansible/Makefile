@@ -1,7 +1,11 @@
 .DEFAULT: help
 
 help:
-	@echo "make run		run ansible-playbook"
+	@echo "make runserver		run consul server ansible-playbook"
+	@echo "make runclient		run consul client ansible-playbook"
 
-run:
+runserver:
 	@/opt/ansible/bin/ansible-playbook -i localhost, consul-server.yml
+
+runclient:
+	@/opt/ansible/bin/ansible-playbook -i localhost, consul-client.yml
