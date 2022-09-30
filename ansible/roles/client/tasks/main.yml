@@ -1,5 +1,24 @@
 ---
 
+- name: install httpd
+  ansible.builtin.dnf:
+    name: httpd
+    state: present
+
+- name: register/start httpd service
+  ansible.builtin.service:
+    name: httpd
+    enabled: True
+    state: started
+
+- name: setup homepage
+  ansible.builtin.copy:
+    content: hello world
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
+
 - name: setup consul.d/example.hcl
   ansible.builtin.template:
     src: example.hcl
