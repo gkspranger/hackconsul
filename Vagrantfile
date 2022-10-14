@@ -25,9 +25,9 @@ SCRIPT
 
 Vagrant.configure("2") do |config|
   servers = [
-    {name: "server1", ip: "192.168.10.10", host_port: 18500},
-    {name: "server2", ip: "192.168.10.20", host_port: 28500},
-    {name: "server3", ip: "192.168.10.30", host_port: 38500},
+    {name: "server1", ip: "192.168.10.10", host_port: 38501},
+    {name: "server2", ip: "192.168.10.20", host_port: 38502},
+    {name: "server3", ip: "192.168.10.30", host_port: 38503},
   ]
 
   servers.each { |item|

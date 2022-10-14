@@ -7,5 +7,6 @@
   roles:
     - role: roles/action/setup
     - role: roles/resource/common
+    - role: roles/resource/dns
     - role: roles/resource/consul
     - role: roles/client

@@ -1,0 +1,6 @@
+---
+
+- name: install bind-utils
+  ansible.builtin.dnf:
+    name: bind-utils
+    state: present
